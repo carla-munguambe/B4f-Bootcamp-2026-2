@@ -1,5 +1,6 @@
 // Vendas de uma semana (dia 1 = segunda-feira … dia 6 = sábado)
 import type { Venda } from "../src/tipos.ts";
+import type { Produto } from "./tipos.ts";
 
 export const vendas = [
   { id: "V001", produtoId: "P001", quantidade: 3, dia: 1 },

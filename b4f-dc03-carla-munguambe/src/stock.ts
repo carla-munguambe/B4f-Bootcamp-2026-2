@@ -1,35 +1,34 @@
 // Mercearia Xiluva — módulo de gestão de stock (solução de referência do Desafio de Código I, a migrar para TypeScript no DC-03)
 // Regras: só métodos de array (sem for/while) e sem alterar os dados recebidos.
-import { TAXA_IVA } from "../dados/produtos.js";
-
+import { TAXA_IVA } from "../dados/produtos.ts";
+import type { IdProduto } from "../dados/tipos.ts";
+import type { Produto } from "./tipos.ts";
 // ---------- Auxiliares (não exportadas) ----------
 
 // Arredonda a 2 casas decimais: 985.9999999999999 → 986
-const arredondar = (valor) => Math.round(valor * 100) / 100;
+const arredondar = (valor:number) => Math.round(valor * 100) / 100;
 
 // "Água Mineral" → "agua mineral" (usada na pesquisa sem acentos — tarefa 17)
-const normalizar = (texto) =>
-  texto
+const normalizar = (texto:string) =>texto
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
 
 // Comparação de nomes com a ordem alfabética portuguesa (Á, Ç, Ó no sítio certo)
-const porNome = (a, b) => a.nome.localeCompare(b.nome, "pt");
-
+const porNome = (a:Pick<Produto , "nome">, b:Pick<Produto , "nome">):number => a.nome.localeCompare(b.nome, "pt");
 // =====================================================================
 // Nível 1 · Essencial
 // =====================================================================
 
 // Tarefa 1 — preço unitário com IVA
-export const precoComIva = (produto, taxa = TAXA_IVA) =>
+export const precoComIva = (produto: Pick<Produto, "precoBase">, taxa = TAXA_IVA) =>
   arredondar(produto.precoBase * (1 + taxa));
 
 // Tarefa 2 — só os produtos activos
-export const listarActivos = (produtos) => produtos.filter((p) => p.activo);
+export const listarActivos = (produtos: readonly Produto []) => produtos.filter((p) => p.activo);
 
 // Tarefa 3 — valor do stock dos produtos activos
-export function valorDoStock(produtos) {
+export function ValorDoStock(produtos: Produto[]) {
   const semIva = arredondar(
     listarActivos(produtos).reduce((soma, p) => soma + p.precoBase * p.stock, 0),
   );
@@ -37,8 +36,9 @@ export function valorDoStock(produtos) {
   return { semIva, iva, comIva: arredondar(semIva + iva) };
 }
 
+
 // Tarefa 4 — activos abaixo do stock mínimo, do mais urgente ao menos urgente
-export const abaixoDoMinimo = (produtos) =>
+export const abaixoDoMinimo = (produtos: Produto[]) =>
   listarActivos(produtos)
     .filter((p) => p.stock < p.stockMinimo)
     .map(({ id, nome, stock, stockMinimo }) => ({
@@ -50,10 +50,10 @@ export const abaixoDoMinimo = (produtos) =>
     .toSorted((a, b) => b.emFalta - a.emFalta || porNome(a, b));
 
 // Tarefa 5 — um produto pelo id (ou undefined)
-export const obterPorId = (produtos, id) => produtos.find((p) => p.id === id);
+export const obterPorId = (produtos: readonly Produto [],id: IdProduto) => produtos.find((p) => p.id === id);
 
 // Tarefas 6 e 17 — pesquisa sem distinguir maiúsculas nem acentos
-export function pesquisar(produtos, termo) {
+export function pesquisar(produtos: Produto[], termo:string) {
   const procurado = normalizar(termo.trim());
   return listarActivos(produtos).filter((p) =>
     normalizar(p.nome).includes(procurado),
@@ -207,4 +207,13 @@ export function sugerirEncomenda(produtos) {
     ];
   });
   return { linhas, custoTotal: linhas.reduce((soma, l) => soma + l.custo, 0) };
+}
+
+
+export function valorDoStock(produtos: readonly Produto[]): ValorStock {
+  const semIva = arredondar(
+    listarActivos(produtos).reduce((soma, p) => soma + p.precoBase * p.stock, 0),
+  );
+  const iva = arredondar(semIva * TAXA_IVA);
+  return { semIva, iva, comIva: arredondar(semIva + iva) };
 }
