@@ -63,17 +63,19 @@ export function pesquisar(produtos: Produto[], termo:string) {
 // Tarefa 7 — cópia ordenada por nome, preço ou stock
 const COMPARADORES = {
   nome: porNome,
-  preco: (a, b) => a.precoBase - b.precoBase,
-  stock: (a, b) => b.stock - a.stock,
+  preco: (a:Pick<Produto , "precoBase">, b:Pick<Produto , "precoBase">) => a.precoBase - b.precoBase,
+  stock: (a:Pick<Produto , "stock">, b:Pick<Produto , "stock">) => b.stock - a.stock,
 };
 
-export function ordenar(produtos, criterio) {
+export function ordenar(produtos: Pick<Produto, "stock" | "precoBase">, criterio: CriterioOrdenacao) {
   const comparar = COMPARADORES[criterio];
   if (!comparar)
-    throw new RangeError(`Critério de ordenação inválido: ${criterio}`);
+    throw new RangeError(Critério de ordenação inválido: ${criterio});
   // toSorted devolve uma cópia; sort alteraria o array original
   return produtos.toSorted(comparar);
 }
+
+
 
 // =====================================================================
 // Nível 2 · Intermédio
