@@ -1,0 +1,13 @@
+{
+  "name": "cart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node --watch/src/main.js"
+  },
+  "keywords": [],
+  "author": "carla",
+  "license": "ISC",
+  "type": "module"
+}
